@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shenchao.mapper.BrandMapper">
+    <resultMap id="brand" type="com.shenchao.entity.Brand">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="sort" property="sort"/>
+        <result column="is_display" property="isDisplay"/>
+    </resultMap>
+    <insert id="save" parameterType="com.shenchao.entity.Brand">
+        <selectKey keyProperty="id" order="AFTER" resultType="int">
+            SELECT last_insert_id()
+        </selectKey>
+        INSERT INTO bbs_brand (name, description, img_url, web_site, sort, is_display) VALUES
+        (#{name},#{description},#{imgUrl},#{webSite},#{sort},#{isDisplay})
+    </insert>
+    <update id="update" parameterType="com.shenchao.entity.Brand">
+        UPDATE bbs_brand
+        <set>
+            <if test="name!=null">
+                name = #{name},
+            </if>
+            <if test="description!=null">
+                description = #{description},
+            </if>
+            <if test="imgUrl!=null">
+                img_url = #{imgUrl},
+            </if>
+            <if test="sort!=null">
+                sort = #{sort},
+            </if>
+            <if test="isDisplay!=null">
+                is_display = #{isDisplay}
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+    <delete id="delete" parameterType="int">
+      DELETE FROM bbs_brand WHERE id = #{id}
+    </delete>
+    <delete id="deleteByIds" parameterType="ArrayList">
+        DELETE FROM bbs_brand
+        <where>
+            id in
+            <foreach collection="list" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+
+    </delete>
+    <select id="getBrandList" resultMap="brand" parameterType="com.shenchao.entity.Brand">
+        SELECT id,name,description,img_url,sort,is_display FROM bbs_brand
+        <where>
+            <if test="isDisplay!=null">
+                and is_display = ${isDisplay}
+            </if>
+            <if test="name!=null and name!=''">
+                and name like '%${name}%'
+            </if>
+        </where>
+        ORDER BY sort DESC
+    </select>
+    <select id="findById" resultMap="brand" parameterType="int">
+        SELECT * FROM bbs_brand
+        <where>
+            id = #{id}
+        </where>
+    </select>
+</mapper>
