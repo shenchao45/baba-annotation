@@ -1,9 +1,11 @@
 package com.shenchao.entity;
 
+import java.io.Serializable;
+
 /**
  * Created by shenchao on 2017/2/11.
  */
-public class Brand {
+public class Brand implements Serializable{
     private Integer id;
     private String name;
     private String description;

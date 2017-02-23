@@ -7,7 +7,7 @@ import com.shenchao.entity.BbsBrandExample;
 import com.shenchao.entity.Brand;
 import com.shenchao.mapper.BbsBrandMapper;
 import com.shenchao.mapper.BrandMapper;
-import com.shenchao.service.ProductService;
+import net.spy.memcached.MemcachedClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Created by shenchao on 2017/2/11.
@@ -46,9 +48,19 @@ public class TestMapper {
         System.out.println(bbsBrands.size());
     }
     @Autowired
-    private ProductService productService;
+    private MemcachedClient memcachedClient;
+
     @Test
-    public void testProductMapper(){
+    public void testMemcached() throws ExecutionException, InterruptedException {
+        Future<Boolean> abc = memcachedClient.set("23", 100, "是网差");
+        Boolean aBoolean = abc.get();
+        System.out.println(aBoolean);
+    }
+
+    @Test
+    public void getMemcached(){
+        Object o = memcachedClient.get("23");
+        System.out.println(o);
     }
 
 }

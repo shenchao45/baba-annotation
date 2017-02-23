@@ -2,6 +2,7 @@ package com.shenchao;
 
 import com.github.pagehelper.PageInterceptor;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import net.spy.memcached.MemcachedClient;
 import org.apache.ibatis.plugin.Interceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
@@ -11,8 +12,11 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
+import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.Properties;
 
 /**
@@ -21,6 +25,7 @@ import java.util.Properties;
 @Configuration
 @PropertySource({"classpath:jdbc.properties"})
 @EnableTransactionManagement(proxyTargetClass = true)
+@EnableAspectJAutoProxy
 @ComponentScan(basePackages = "com.shenchao",excludeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION,classes = {Controller.class,Configuration.class})})
 @MapperScan(basePackages = "com.shenchao.mapper")
 public class SpringConfig {
@@ -33,8 +38,8 @@ public class SpringConfig {
     @Value("${jdbc.driverName}")
     private String driverName;
 
-    @Bean
-    public DataSource dataSource() throws PropertyVetoException {
+    @Bean(destroyMethod = "close")
+    public ComboPooledDataSource dataSource() throws PropertyVetoException {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
         dataSource.setPassword(password);
         dataSource.setUser(username);
@@ -58,5 +63,10 @@ public class SpringConfig {
         sqlSessionFactoryBean.setPlugins(new Interceptor[]{interceptor});
         return sqlSessionFactoryBean;
     }
-
+    @Bean
+    public MemcachedClient memcachedClient() throws IOException {
+        InetAddress address = Inet4Address.getByName("192.168.187.128");
+        InetSocketAddress address1 = new InetSocketAddress(address, 11211);
+        return new MemcachedClient(address1);
+    }
 }
